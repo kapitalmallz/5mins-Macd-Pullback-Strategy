@@ -16,7 +16,7 @@ jobs:
           python-version: '3.11'
 
       - name: Restore signal log cache
-        uses: actions/cache@v4
+        uses: actions/cache@v4  # Updated line
         with:
           path: signals_log.json
           key: signal-log-v1
@@ -31,7 +31,7 @@ jobs:
         run: python strategy3.py
 
       - name: Save signal log cache
-        uses: actions/cache@v4
+        uses: actions/cache@v4  # Updated line
         with:
           path: signals_log.json
           key: signal-log-v1
