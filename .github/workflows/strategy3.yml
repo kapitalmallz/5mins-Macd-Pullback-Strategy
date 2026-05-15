@@ -2,7 +2,6 @@ name: Strategy 3 - 5m Scan
 
 on:
   schedule:
-    # Run every 5 minutes (UTC). The script filters by WAT hours internally.
     - cron: '*/5 * * * *'
   workflow_dispatch:
 
@@ -10,18 +9,20 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
+      - name: Restore signal log cache
+        uses: actions/cache@v4
+        with:
+          path: signals_log.json
+          key: signal-log-v1
+
       - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install yfinance pandas requests pytz
+        run: pip install yfinance pandas requests pytz
 
       - name: Run strategy script
         env:
@@ -29,10 +30,8 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python strategy3.py
 
-      - name: Commit signal log
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add signals_log.json
-          git diff --staged --quiet || git commit -m "Update signal log"
-          git push
+      - name: Save signal log cache
+        uses: actions/cache@v4
+        with:
+          path: signals_log.json
+          key: signal-log-v1
